@@ -9,18 +9,19 @@ import rospy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('agent_num', type=int, help='agent number', default=0)
+parser.add_argument('total_agents', type=int, help='total number of agents', default=1)
 args = parser.parse_args()
 
 
 if __name__ == '__main__':
 
-    agent = Agent(args.agent_num)
-    
+    agent = Agent(args.agent_num, args.total_agents)
+
     try:
         agent.run()
     except rospy.ROSInterruptException:
         pass
-    
+
 #    env         = DoubleIntegrator()
 #    model       = DoubleIntegrator()
 #    t_dist      = TargetDist(num_nodes=2)
