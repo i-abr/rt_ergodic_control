@@ -14,13 +14,15 @@ class TargetDist(object):
         grid = np.meshgrid(*[np.linspace(0, 1, num_pts) for _ in range(2)])
         self.grid = np.c_[grid[0].ravel(), grid[1].ravel()]
 
-        self.means = [npr.uniform(0.2, 0.8, size=(2,))
-                            for _ in range(num_nodes)]
-        # self.means = [np.array([0.2, 0.2]), np.array([0.7,0.7])]
-        # self.vars  = [np.array([0.1,0.1])**2, np.array([0.1,0.1])**2]
+        # self.means = [npr.uniform(0.2, 0.8, size=(2,))
+        #                     for _ in range(num_nodes)]
+        self.means = [np.array([0.2, 0.2]), np.array([0.7,0.7])]
+        self.vars  = [np.array([0.1,0.1])**2, np.array([0.1,0.1])**2]
 
-        self.vars  = [npr.uniform(0.05, 0.2, size=(2,))**2
-                            for _ in range(num_nodes)]
+        print("means: ", self.means)
+
+        # self.vars  = [npr.uniform(0.05, 0.2, size=(2,))**2
+        #                     for _ in range(num_nodes)]
 
         self.grid_vals = self.__call__(self.grid)
 

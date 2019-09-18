@@ -17,7 +17,7 @@ class Agent(DoubleIntegrator):
 
         DoubleIntegrator.__init__(self)
 
-        rospy.init_node('agent{}'.format(agent_num))
+        #rospy.init_node('agent{}'.format(agent_num))
         self.rate = rospy.Rate(30)
 
         self.agent_name = 'agent{}'.format(agent_num)
