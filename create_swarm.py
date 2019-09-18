@@ -24,5 +24,9 @@ if __name__ == '__main__':
         )
         processes.append(launch.launch(nodes[-1]))
 
-    rospy.init_node('test', anonymous=True)
-    rospy.spin()
+    try:
+        rospy.init_node('test', anonymous=True)
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
+    
