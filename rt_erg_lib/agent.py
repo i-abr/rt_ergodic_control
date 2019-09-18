@@ -17,7 +17,7 @@ class Agent(DoubleIntegrator):
 
         DoubleIntegrator.__init__(self)
 
-        #rospy.init_node('agent{}'.format(agent_num))
+        rospy.init_node('agent{}'.format(agent_num))
         self.rate = rospy.Rate(30)
 
         self.agent_name = 'agent{}'.format(agent_num)
@@ -41,10 +41,14 @@ class Agent(DoubleIntegrator):
 
     def run(self):
         while not rospy.is_shutdown():
+
+            # TODO: if self.t_dist.has_update == True:
+            #           self.controller.phik = convert_phi2phik(** do the same as above **)
+            #           self.t_dist.has_update = False
             ctrl = self.controller(self.state)
             state = self.step(ctrl)
 
-            self.broadcast.sendTransform((self.state[0], self.state[1], 1.0),
+            self.broadcast.sendTransform((state[0], state[1], 1.0),
                                          (0, 0, 0, 1), # quaternion
                                          rospy.Time.now(),
                                          self.agent_name,

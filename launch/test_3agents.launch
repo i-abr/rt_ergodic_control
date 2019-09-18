@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<launch>
-
-  <node name="agent1" pkg="rt_ergodic_control" type="create_agent.py" args="1 3" output="screen"/>
-  <node name="agent2" pkg="rt_ergodic_control" type="create_agent.py" args="2 3"/>
-  <node name="agent3" pkg="rt_ergodic_control" type="create_agent.py" args="3 3"/>
-
-</launch>

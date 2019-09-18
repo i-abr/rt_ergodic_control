@@ -1,3 +1,5 @@
+import rospy
+
 import numpy as np
 import numpy.random as npr
 
@@ -9,6 +11,9 @@ class TargetDist(object):
     '''
 
     def __init__(self, num_nodes=2, num_pts=50):
+        
+        # TODO: create a message class for this 
+        # rospy.Subscriber('/target_distribution',  CLASSNAME, self.callback)
 
         self.num_pts = num_pts
         grid = np.meshgrid(*[np.linspace(0, 1, num_pts) for _ in range(2)])

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <node name="swarm" pkg="rt_ergodic_control" type="create_swarm.py" args="3" output="screen"/>
+
+</launch>
