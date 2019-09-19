@@ -23,9 +23,10 @@ class Agent(DoubleIntegrator):
         self.agent_name = 'agent{}'.format(agent_num)
         self.model      = DoubleIntegrator()
 
-        self.tdist_sub = rospy.Subscriber('/target_distribution', Target_dist, self.update_tdist)
-        self.tdist.has_update = False 
-        # self.t_dist      = TargetDist(num_nodes=2) #TODO: remove example target distribution
+        # self.tdist_sub = rospy.Subscriber('/target_distribution', Target_dist, self.update_tdist)
+        # self.tdist.has_update = False 
+        self.t_dist      = TargetDist(num_nodes=2) #TODO: remove example target distribution
+        
         self.controller  = RTErgodicControl(self.model, self.t_dist,
                                 horizon=15, num_basis=5, batch_size=-1)
 
@@ -44,14 +45,18 @@ class Agent(DoubleIntegrator):
 
     def update_tdist(self, data):
         self.t_dist.grid_vals = data.target_array
+        num_pts = np.shape(self.t_dist.grid_vals)[0]
+        grid = np.meshgrid(*[np.linspace(0, 1, num_pts) for _ in range(2)])
+        self.t_dist.grid = np.c_[grid[0].ravel(), grid[1].ravel()]
+
         self.tdist.has_update = True
     def run(self):
         while not rospy.is_shutdown():
 
             # TODO:
-            if self.tdist.has_update == True:
-                self.controller.phik = convert_phi2phik(self.controller.basis, self.t_dist.grid_vals, self.t_dist.grid)
-                self.t_dist.has_update = False
+            # if self.tdist.has_update == True:
+            #     self.controller.phik = convert_phi2phik(self.controller.basis, self.t_dist.grid_vals, self.t_dist.grid)
+            #     self.t_dist.has_update = False
             ctrl = self.controller(self.state)
             state = self.step(ctrl)
 
