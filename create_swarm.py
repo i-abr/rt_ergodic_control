@@ -20,7 +20,7 @@ if __name__ == '__main__':
         node_name = 'agent{}'.format(i)
         args = '{} {}'.format(i, num_agents)
         nodes.append(
-            roslaunch.core.Node(package=package, node_type=executable, name=node_name, args=args)
+            roslaunch.core.Node(package=package, node_type=executable, name=node_name, args=args,output="screen")
         )
         processes.append(launch.launch(nodes[-1]))
 

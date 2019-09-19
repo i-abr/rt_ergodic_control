@@ -29,6 +29,7 @@ class TargetDist(object):
         # self.vars  = [npr.uniform(0.05, 0.2, size=(2,))**2
         #                     for _ in range(num_nodes)]
 
+        self.has_update = False
         self.grid_vals = self.__call__(self.grid)
 
     def get_grid_spec(self):
