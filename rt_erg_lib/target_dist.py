@@ -21,7 +21,7 @@ class TargetDist(object):
 
         # self.means = [npr.uniform(0.2, 0.8, size=(2,))
         #                     for _ in range(num_nodes)]
-        self.means = [np.array([0.3, 0.3]), np.array([0.7,0.7])]
+        self.means = [np.array([0.2, 0.2]), np.array([0.6,0.6])]
         self.vars  = [np.array([0.1,0.1])**2, np.array([0.1,0.1])**2]
 
         print("means: ", self.means)

@@ -12,6 +12,8 @@ import rospy
 import tf
 
 from vr_exp_ros.msg import Target_dist
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point
 
 class Agent(DoubleIntegrator):
 
@@ -28,7 +30,7 @@ class Agent(DoubleIntegrator):
         self.t_dist      = TargetDist(num_nodes=2) #TODO: remove example target distribution
         
         self.controller  = RTErgodicControl(self.model, self.t_dist,
-                                            horizon=15, num_basis=5, batch_size=50)#, batch_size=-1)
+                                            horizon=15, num_basis=5, batch_size=30,capacity=100)#, batch_size=-1)
 
         # setting the phik on the ergodic controller
         self.controller.phik = convert_phi2phik(self.controller.basis,
@@ -44,7 +46,22 @@ class Agent(DoubleIntegrator):
                                      rospy.Time.now(),
                                      self.agent_name,
                                      "world")
+        self.__max_points = 1000
+        self.marker_pub = rospy.Publisher('/agent{}/marker_pose'.format(agent_num), Marker, queue_size=1)
+        self.marker = Marker()
+        self.marker.id = agent_num
+        self.marker.type = Marker.LINE_STRIP
+        self.marker.header.frame_id = "world"
+        self.marker.scale.x = .01
+        self.marker.scale.y = .01
+        self.marker.scale.z = .01
 
+        color = [0.0,0.0,0.0]
+        color[agent_num] = 1.0
+        self.marker.color.a = .7
+        self.marker.color.r = color[0]
+        self.marker.color.g = color[1]
+        self.marker.color.b = color[2]
     def update_tdist(self, data):
         print("updating tdist in subscriber")
         self.t_dist.grid_vals = np.array(data.target_array)
@@ -58,6 +75,7 @@ class Agent(DoubleIntegrator):
             if self.t_dist.has_update == True:
                 print("updating phik")
                 self.controller.phik = convert_phi2phik(self.controller.basis, self.t_dist.grid_vals)
+                print("new phik", self.controller.phik[0:4])
                 self.t_dist.has_update = False
             ctrl = self.controller(self.state)
             state = self.step(ctrl)
@@ -67,4 +85,17 @@ class Agent(DoubleIntegrator):
                                          rospy.Time.now(),
                                          self.agent_name,
                                          "world")
+            pnt = Point()
+            pnt.x = state[0]
+            pnt.y = state[1]
+            pnt.z = 1.0
+            if len(self.marker.points) < self.__max_points:
+                self.marker.points.append(pnt)
+            else:
+                self.marker.points[:-1] = self.marker.points[1:]
+                self.marker.points[-1] = pnt
+            self.marker.pose.position.x = 0*state[0]
+            self.marker.pose.position.y = 0*state[1]
+            self.marker.pose.position.z = 0*1.0
+            self.marker_pub.publish(self.marker)
             self.rate.sleep()
