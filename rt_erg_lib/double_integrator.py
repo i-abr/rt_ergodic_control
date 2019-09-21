@@ -36,6 +36,7 @@ class DoubleIntegrator(object):
                 [0., 1.0]
         ])
 
+        self.reset()
 
 
     def fdx(self, x, u):

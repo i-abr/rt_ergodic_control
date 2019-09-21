@@ -11,6 +11,7 @@ import os
 import rospy
 import tf
 
+from rt_ergodic_control.msg import Ck_msg
 from vr_exp_ros.msg import Target_dist
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
@@ -24,13 +25,15 @@ class Agent(DoubleIntegrator):
         rospy.init_node('agent{}'.format(agent_num))
         self.rate = rospy.Rate(30)
 
+        self.agent_num = agent_num
+        self.tot_agents = tot_agents
         self.agent_name = 'agent{}'.format(agent_num)
         self.model      = DoubleIntegrator()
 
-        self.t_dist      = TargetDist(num_nodes=2) #TODO: remove example target distribution
+        self.t_dist      = TargetDist(num_nodes=3) #TODO: remove example target distribution
         
         self.controller  = RTErgodicControl(self.model, self.t_dist,
-                                            horizon=15, num_basis=5, batch_size=30,capacity=100)#, batch_size=-1)
+                                            horizon=15, num_basis=5, batch_size=200,capacity=500)#, batch_size=-1)
 
         # setting the phik on the ergodic controller
         self.controller.phik = convert_phi2phik(self.controller.basis,
@@ -62,6 +65,21 @@ class Agent(DoubleIntegrator):
         self.marker.color.r = color[0]
         self.marker.color.g = color[1]
         self.marker.color.b = color[2]
+
+        # Publisher for Ck Sharing
+        self.ck_pub = rospy.Publisher('agent{}/ck'.format(agent_num), Ck_msg, queue_size=1)
+
+        # Ck Subscriber for all agent ck's
+
+        self.ck_list = [None]*tot_agents
+        for i in range(tot_agents):
+            rospy.Subscriber('agent{}/ck'.format(i), Ck_msg, self.update_ck)
+            
+
+    def update_ck(self, data):
+        i = data.agent_num
+        self.ck_list[i] = np.array(data.ck_array)        
+
     def update_tdist(self, data):
         print("updating tdist in subscriber")
         self.t_dist.grid_vals = np.array(data.target_array)
@@ -71,15 +89,30 @@ class Agent(DoubleIntegrator):
     def run(self):
         while not rospy.is_shutdown():
 
-            # TODO:
+            # If necessary, update target distribution:
             if self.t_dist.has_update == True:
-                print("updating phik")
                 self.controller.phik = convert_phi2phik(self.controller.basis, self.t_dist.grid_vals)
-                print("new phik", self.controller.phik[0:4])
                 self.t_dist.has_update = False
-            ctrl = self.controller(self.state)
+
+            comm_link = True
+            for _ck in self.ck_list:
+                if _ck is None:
+                    comm_link = False
+            # Update ck in controller
+            if comm_link:
+                ctrl = self.controller(self.state, self.ck_list, self.agent_num)
+            else:
+                ctrl = self.controller(self.state)
+
+            # Publish Current Ck
+            ck_msg = Ck_msg()
+            ck_msg.agent_num = self.agent_num
+            ck_msg.ck_array = self.controller.ck.copy()
+            self.ck_pub.publish(ck_msg)
+            
             state = self.step(ctrl)
 
+            
             self.broadcast.sendTransform((state[0], state[1], 1.0),
                                          (0, 0, 0, 1), # quaternion
                                          rospy.Time.now(),

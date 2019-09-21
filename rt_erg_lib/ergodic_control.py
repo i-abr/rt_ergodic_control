@@ -30,6 +30,9 @@ class RTErgodicControl(object):
         self.Rinv = np.linalg.inv(weights['R'])
 
         self._phik = None
+        self.ck = None
+
+        
 
     def reset(self):
         self.u_seq = [0.0*self.model.action_space.sample()
@@ -46,7 +49,7 @@ class RTErgodicControl(object):
         self._phik = phik
 
 
-    def __call__(self, state):
+    def __call__(self, state, ck_list=None, agent_num=None):
         assert self.phik is not None, 'Forgot to set phik, use set_target_phik method'
 
         self.u_seq[:-1] = self.u_seq[1:]
@@ -81,6 +84,11 @@ class RTErgodicControl(object):
         N = len(pred_traj)
         ck = np.sum([self.basis.fk(xt) for xt in pred_traj], axis=0) / N
 
+        self.ck = ck.copy()
+        if ck_list is not None:
+            ck_list[agent_num] = ck
+            ck = np.mean(ck_list, axis=0)
+                
         fourier_diff = self.lamk * (ck - self.phik)
         fourier_diff = fourier_diff.reshape(-1,1)
 
