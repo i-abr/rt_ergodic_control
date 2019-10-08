@@ -30,10 +30,13 @@ class Agent(DoubleIntegrator):
         self.agent_name = 'agent{}'.format(agent_num)
         self.model      = DoubleIntegrator()
 
-        self.t_dist      = TargetDist(num_nodes=3) #TODO: remove example target distribution
+        self.t_dist      = TargetDist(num_nodes=1) #TODO: remove example target distribution
         
+        # self.controller  = RTErgodicControl(self.model, self.t_dist,
+        #                                     horizon=15, num_basis=5, batch_size = 300, capacity=500)#batch_size=200,capacity=500)#, batch_size=-1)
+
         self.controller  = RTErgodicControl(self.model, self.t_dist,
-                                            horizon=15, num_basis=5, batch_size = 300, capacity=500)#batch_size=200,capacity=500)#, batch_size=-1)
+                                            horizon=30, num_basis=5, batch_size = 50, capacity=200)#horizon=30 for dt = 0.05#batch_size=200,capacity=500)#, batch_size=-1)
 
         # setting the phik on the ergodic controller
         self.controller.phik = convert_phi2phik(self.controller.basis,

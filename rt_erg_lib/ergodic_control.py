@@ -7,7 +7,7 @@ class RTErgodicControl(object):
 
     def __init__(self, model, target_dist,
                     weights=None, horizon=100, num_basis=5,
-                    capacity=100000, batch_size=20):
+                    capacity=100000, batch_size=20,usat=None):
 
         self.model       = model
         self.target_dist = target_dist
@@ -25,13 +25,17 @@ class RTErgodicControl(object):
         self.u_seq = [0.0*self.model.action_space.sample()
                         for _ in range(horizon)]
         if weights is None:
-            weights = {'R' : np.eye(self.model.action_space.shape[0])}
+            weights = {'R' : np.eye(self.model.action_space.shape[0])*5}
 
         self.Rinv = np.linalg.inv(weights['R'])
 
         self._phik = None
         self.ck = None
 
+        self.usat=None
+
+        self.umax = 1
+        self.max_unorm = 1
         
 
     def reset(self):
@@ -48,7 +52,14 @@ class RTErgodicControl(object):
         assert len(phik) == self.basis.tot_num_basis, 'phik does not have the same number as ck'
         self._phik = phik
 
-
+    def saturate(self, ustar):
+        u = ustar.copy()
+        unorm = np.linalg.norm(u)
+        if unorm > self.max_unorm:
+            u = self.umax * u/unorm
+            return u
+        return u
+            
     def __call__(self, state, ck_list=None, agent_num=None):
         assert self.phik is not None, 'Forgot to set phik, use set_target_phik method'
 
@@ -108,4 +119,6 @@ class RTErgodicControl(object):
 
         self.replay_buffer.push(state[self.model.explr_idx])
 
-        return self.u_seq[0].copy()
+        ustar = self.u_seq[0].copy()
+        u = self.saturate(ustar)
+        return u #self.u_seq[0].copy()

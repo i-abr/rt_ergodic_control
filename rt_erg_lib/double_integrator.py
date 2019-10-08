@@ -20,7 +20,7 @@ class DoubleIntegrator(object):
 
         self.explr_idx  = [0, 1]
 
-        self.dt = 0.1
+        self.dt = 0.05#0.1
 
         self.A = np.array([
                 [0., 0., 1.0-0.2, 0.],
