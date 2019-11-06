@@ -54,20 +54,20 @@ class Agent(DoubleIntegrator):
                                      "world")
         self.__max_points = 1000
         self.marker_pub = rospy.Publisher('/agent{}/marker_pose'.format(agent_num), Marker, queue_size=1)
-        self.marker = Marker()
-        self.marker.id = agent_num
-        self.marker.type = Marker.LINE_STRIP
-        self.marker.header.frame_id = "world"
-        self.marker.scale.x = .01
-        self.marker.scale.y = .01
-        self.marker.scale.z = .01
+        # self.marker = Marker()
+        # self.marker.id = agent_num
+        # self.marker.type = Marker.LINE_STRIP
+        # self.marker.header.frame_id = "world"
+        # self.marker.scale.x = .01
+        # self.marker.scale.y = .01
+        # self.marker.scale.z = .01
 
-        color = [0.0,0.0,0.0]
-        color[agent_num] = 1.0
-        self.marker.color.a = .7
-        self.marker.color.r = color[0]
-        self.marker.color.g = color[1]
-        self.marker.color.b = color[2]
+        # color = [0.0,0.0,0.0]
+        # color[agent_num] = 1.0
+        # self.marker.color.a = .7
+        # self.marker.color.r = color[0]
+        # self.marker.color.g = color[1]
+        # self.marker.color.b = color[2]
 
         # Publisher for Ck Sharing
         self.ck_pub = rospy.Publisher('agent{}/ck'.format(agent_num), Ck_msg, queue_size=1)
@@ -121,17 +121,17 @@ class Agent(DoubleIntegrator):
                                          rospy.Time.now(),
                                          self.agent_name,
                                          "world")
-            pnt = Point()
-            pnt.x = state[0]
-            pnt.y = state[1]
-            pnt.z = 1.0
-            if len(self.marker.points) < self.__max_points:
-                self.marker.points.append(pnt)
-            else:
-                self.marker.points[:-1] = self.marker.points[1:]
-                self.marker.points[-1] = pnt
-            self.marker.pose.position.x = 0*state[0]
-            self.marker.pose.position.y = 0*state[1]
-            self.marker.pose.position.z = 0*1.0
-            self.marker_pub.publish(self.marker)
+            # pnt = Point()
+            # pnt.x = state[0]
+            # pnt.y = state[1]
+            # pnt.z = 1.0
+            # if len(self.marker.points) < self.__max_points:
+            #     self.marker.points.append(pnt)
+            # else:
+            #     self.marker.points[:-1] = self.marker.points[1:]
+            #     self.marker.points[-1] = pnt
+            # self.marker.pose.position.x = 0*state[0]
+            # self.marker.pose.position.y = 0*state[1]
+            # self.marker.pose.position.z = 0*1.0
+            # self.marker_pub.publish(self.marker)
             self.rate.sleep()

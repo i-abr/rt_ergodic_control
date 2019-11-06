@@ -14,8 +14,10 @@ if __name__ == '__main__':
     launch = roslaunch.scriptapi.ROSLaunch()
     launch.start()
 
-
-    num_agents = 3
+    if rospy.has_param('/num_agents'):
+        num_agents = rospy.get_param('/num_agents')#3
+    else:
+        num_agents = 3
     for i in range(num_agents):
         node_name = 'agent{}'.format(i)
         args = '{} {}'.format(i, num_agents)
