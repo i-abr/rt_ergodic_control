@@ -11,8 +11,8 @@ class TargetDist(object):
     '''
 
     def __init__(self, num_nodes=2, num_pts=50):
-        
-        # TODO: create a message class for this 
+
+        # TODO: create a message class for this
         # rospy.Subscriber('/target_distribution',  CLASSNAME, self.callback)
 
         self.num_pts = num_pts
@@ -21,8 +21,8 @@ class TargetDist(object):
 
         # self.means = [npr.uniform(0.2, 0.8, size=(2,))
         #                     for _ in range(num_nodes)]
-        self.means = [np.array([0.2, 0.2]), np.array([0.6,0.6]), np.array([0.2, 0.8])]
-        self.vars  = [np.array([0.1,0.1])**2, np.array([0.1,0.1])**2, np.array([0.1,0.1])**2]
+        self.means = [np.array([0.7, 0.7]), np.array([0.3,0.3])]
+        self.vars  = [np.array([0.1,0.1])**2, np.array([0.1,0.1])**2]
 
         print("means: ", self.means)
 
@@ -51,4 +51,6 @@ class TargetDist(object):
             val += np.exp(-innerds/2.0)# / np.sqrt((2*np.pi)**2 * np.prod(v))
         # normalizes the distribution
         val /= np.sum(val)
+        # val -= np.max(val)
+        # val = np.abs(val)
         return val
