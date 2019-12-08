@@ -22,6 +22,7 @@ class GroundVehicle(Agent):
 
         self.curr_lat = None
         self.curr_lon = None
+        
         rospy.Subscriber('latlong_pos', PoseStamped, self.latlong_callback)
         rospy.Subscriber('grid_pts', PoseArray, self.get_grid)
 
@@ -81,15 +82,14 @@ class GroundVehicle(Agent):
             pass
         else:
             next_pose = self.control_step()
-            x = next_pose[0] #.5#*np.cos(self._t_theta) + 0.5
-            y = next_pose[1] #0.#*np.sin(self._t_theta) + 0.5
-            coord = self._dist_to_coord([x, y])
-            self.goal_pose.target_latitude = coord[0]
+            coord = self._dist_to_coord(next_pose)
+            self.goal_pose.target_latitude  = coord[0]
             self.goal_pose.target_longitude = coord[1]
             try:
                 print("Sending pose")
                 print("(%f,%f)" % (coord[0], coord[1]))
-                self.sendPose(self.goal_pose.target_latitude, self.goal_pose.target_longitude, -1)
+                result = self.sendPose(self.goal_pose.target_latitude, self.goal_pose.target_longitude, -1)
+                print(result)
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
 

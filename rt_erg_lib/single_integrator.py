@@ -67,9 +67,11 @@ class SingleIntegrator(object):
 
     @property
     def state(self):
-        self._state.copy()
+        return self._state.copy()
 
-    @
+    @state.setter
+    def state(self, x):
+        self._state = x.copy()
 
     def step(self, a):
         # TODO: include ctrl clip
