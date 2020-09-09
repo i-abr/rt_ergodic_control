@@ -7,7 +7,7 @@ class RTErgodicControl(object):
 
     def __init__(self, model, target_dist,
                     weights=None, horizon=100, num_basis=5,
-                    capacity=100000, batch_size=20):
+                    capacity=100000, batch_size=100):
 
         self.model       = model
         self.target_dist = target_dist
@@ -25,7 +25,7 @@ class RTErgodicControl(object):
         self.u_seq = [0.0*self.model.action_space.sample()
                         for _ in range(horizon)]
         if weights is None:
-            weights = {'R' : np.eye(self.model.action_space.shape[0])}
+            weights = {'R' : 0.1*np.eye(self.model.action_space.shape[0])}
 
         self.Rinv = np.linalg.inv(weights['R'])
 

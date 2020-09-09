@@ -6,7 +6,7 @@ class Barrier(object):
     This class prevents the agent from
     going outside the exploration space
     '''
-    def __init__(self, explr_space, pow=2, weight=100):
+    def __init__(self, explr_space, pow=2, weight=10.):
         self.explr_space = explr_space
         self.dl  = explr_space.high - explr_space.low
         self.pow = pow
